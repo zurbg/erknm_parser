@@ -17,6 +17,7 @@ class ErknmParser:
     def parse(self) -> Dict[str, Any]:
         """Основной метод парсинга XML данных"""
         return {
+            'knm_date': self._parse_date(),
             'decision': self._parse_decision(),
             'inspectors': self._parse_inspectors(),
             'kind_control': self._parse_kind_control(),
@@ -27,6 +28,11 @@ class ErknmParser:
             'reason_risk': self._parse_reason_risk(),
             'subject': self._parse_organizations(),
         }
+
+    def _parse_date(self) -> Dict:
+        knm_date = self.root.attrib
+        return knm_date
+
 
     def _parse_kind_control(self) -> Dict:
         element = self.root.find('tns:KIND_CONTROL', self.ns)
@@ -63,7 +69,7 @@ class ErknmParser:
             inspectors.append({
                 'full_name': element.get('INSPECTOR_FULL_NAME'),
                 'guid': element.get('GUID'),
-                'position': position.get('TITLE') if position else None
+                'position': position.get('TITLE')
             })
         return inspectors
 
@@ -73,13 +79,11 @@ class ErknmParser:
 
     def _parse_decision(self) -> Dict:
         element = self.root.find('tns:DECISION', self.ns)
-        if not element:
-            return {}
 
         title = element.find('tns:TITLE_SIGNER', self.ns)
         return {
             'signer': element.get('FIO_SIGNER'),
-            'title': title.get('TITLE') if title else None
+            'title': title.get('TITLE')
         }
 
     def _parse_reason_risk(self) -> Dict:
